@@ -11,6 +11,7 @@ LIBMEMCACHED_VERSION=1.0.7
 PHP_VERSION=5.4.12
 NEWRELIC_VERSION=2.9.5.78
 S3_BUCKET=heroku-buildpack-php-tyler
+DRUSH_VERSION="5.8"
 # END CONFIG
 
 #
@@ -22,6 +23,7 @@ MCRYPT_FILE="libmcrypt-${LIBMCRYPT_VERSION}.tar.gz"
 MEMCACHED_FILE="libmemcached-${LIBMEMCACHED_VERSION}.tar.gz"
 PHP_FILE="php-${PHP_VERSION}-with-fpm-heroku.tar.gz"
 NEWRELIC_FILE="newrelic-${NEWRELIC_VERSION}-heroku.tar.gz"
+DRUSH_FILE="drush-7.x-${DRUSH_VERSION}.tar.gz"
 
 MANIFEST_URL="${S3_URL}/${MANIFEST_FILE}"
 NGINX_URL="${S3_URL}/${NGINX_FILE}"
@@ -30,6 +32,7 @@ MEMCACHED_URL="${S3_URL}/${MEMCACHED_FILE}"
 PHP_URL="${S3_URL}/${PHP_FILE}"
 NEWRELIC_URL="${S3_URL}/${NEWRELIC_FILE}"
 COMPOSER_URL="http://getcomposer.org/composer.phar"
+DRUSH_URL="http://ftp.drupal.org/files/projects/drush-7.x-${DRUSH_VERSION}.tar.gz"
 #
 
 function indent() {
@@ -205,6 +208,13 @@ then
 	export GIT_DIR=${GIT_DIR_ORIG}
 fi
 popd > /dev/null
+
+# Drush Installation
+echo "-----> Installing drush"
+echo "Bundling Drush version $DRUSH_VERSION"
+curl --silent --max-time 60 --location "$DRUSH_URL" | tar xz
+export LD_LIBRARY_PATH=$PWD/php/ext
+export DRUSH_BIN="$PWD/php/bin/php -f $PWD/drush/drush.php -- --php=$PWD/php/bin/php"
 
 # Config files
 echo "-----> Copying config files"
